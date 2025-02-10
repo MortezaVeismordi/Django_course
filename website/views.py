@@ -1,7 +1,8 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 
 def index(request):
-    return HttpResponse('<h1> Home page <h1')
+    return render(request , 'website/index.html')
 
 def about_me(request):
     return HttpResponse('<h1> about me <h1')
