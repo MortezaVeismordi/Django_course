@@ -18,8 +18,9 @@ from django.contrib import admin
 from django.urls import path
 from website.views import index , about_me , contact_me
 
+app_name = "website"
 urlpatterns = [
-    path('' , index),
-    path('about' , about_me),
-    path('contact' , contact_me),
+    path('' , index , name= 'index'),
+    path('about' , about_me , name= 'about'),
+    path('contact' , contact_me , name= 'contact'),
 ]
