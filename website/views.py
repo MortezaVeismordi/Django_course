@@ -9,3 +9,6 @@ def about_me(request):
 
 def contact_me(request):
     return render(request , 'website/contact.html')
+
+def test_view(request):
+    return render(request , 'website/test.html' , {'name': 'Morteza'})
