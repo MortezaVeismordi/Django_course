@@ -7,7 +7,18 @@
     <title>test</title>
 </head>
 <body>
-    <p>hi {% posts as pts %}</p>
-    <p>{% popularposts %}</p>
+    <form action="{% url 'website:test' %}" , method="post">
+        {% csrf_token %}
+        <label>name:</label>
+        <input name='name'type="text">
+        <label>email:</label>
+        <input name='email'type="text">
+        <label>subject:</label>
+        <input name='subject'type="text">
+        <label>message:</label>
+        <input name='message'type="text">
+        <button type="submit">submit</button>
+
+    </form>
 </body>
 </html>
