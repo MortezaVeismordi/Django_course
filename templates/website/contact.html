@@ -13,7 +13,8 @@
 					Contact Us
 				</h1>
 				<p class="text-white link-nav"><a href="index.html">Home </a> <span class="lnr lnr-arrow-right"></span>
-					<a href="contact.html"> Contact Us</a></p>
+					<a href="contact.html"> Contact Us</a>
+				</p>
 			</div>
 		</div>
 	</div>
@@ -72,7 +73,7 @@
 
 							<input name="subject" placeholder="Enter subject" onfocus="this.placeholder = ''"
 								onblur="this.placeholder = 'Enter subject'" class="common-input mb-20 form-control"
-								required="" type="text">
+								type="text">
 						</div>
 						<div class="col-lg-6 form-group">
 							<textarea class="common-textarea form-control" name="message" placeholder="Enter Messege"
@@ -83,6 +84,13 @@
 							<div class="alert-msg" style="text-align: left;"></div>
 							<button type='submit' class="genric-btn primary" style="float: right;">Send Message</button>
 						</div>
+						{% if messages %}
+						<div class="popup show">
+							{% for message in messages %}
+							<p>{{ message }}</p>
+							{% endfor %}
+						</div>
+						{% endif %}
 					</div>
 				</form>
 			</div>

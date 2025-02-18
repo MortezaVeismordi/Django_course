@@ -12,8 +12,9 @@ class NameForm(forms.Form):
 
 
 class ContactForm(forms.ModelForm):
-
+    subject = forms.CharField(required=False)
     class Meta:
         model = Contact
-        fields = '__all__'
+        fields = ['name', 'subject', 'email', 'message']
+        
         

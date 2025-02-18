@@ -15,6 +15,8 @@ def about_me(request):
 
 #---------------------------------------------------------------------
 
+from django.contrib import messages
+
 def contact_me(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -22,9 +24,10 @@ def contact_me(request):
             post = form.save(commit=False)
             post.name = 'Anonymous'
             post.save()
-            messages.add_message(request,messages.SUCCESS , 'your request has been procese')
-    form = ContactForm
-    return render(request , 'website/contact.html' , {'form':form})
+            messages.success(request, 'Your request has been processed successfully!')
+    form = ContactForm()
+    return render(request, 'website/contact.html', {'form': form})
+
 
 #----------------------------------------------------------------------
 

@@ -31,9 +31,50 @@
     <link rel="stylesheet" href="{% static 'css/animate.min.css'%}">
     <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <style>
+        .popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            display: none;
+            /* مخفی باشد تا با JS نمایش داده شود */
+        }
+
+        .popup-content {
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: white;
+        }
+    </style>
+
 </head>
 
 <body>
+    {% if messages %}
+    <div id="popup-message" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+
     <header id="header">
         <div class="header-top">
             <div class="container">
@@ -183,6 +224,7 @@
     </footer>
     <!-- End footer Area -->
 
+
     <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
     <script src="{% static 'js/popper.min.js' %}"></script>
     <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
@@ -197,6 +239,23 @@
     <script src="{% static 'js/owl.carousel.min.js' %}"></script>
     <script src="{% static 'js/mail-script.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        window.onload = function () {
+            var popup = document.getElementById("popup-message");
+            if (popup) {
+                popup.style.display = "block"; 
+                setTimeout(() => {
+                    popup.style.display = "none";
+                }, 5000);
+            }
+        };
+
+        function closePopup() {
+            document.getElementById("popup-message").style.display = "none";
+        }
+    </script>
+
+
 </body>
 
-</html> 
+</html>
