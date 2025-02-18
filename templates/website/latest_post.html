@@ -19,7 +19,7 @@
                     <div class="details">
                         <div class="tags">
                             {% for cat in post.category.all %}
-                            <a href="#"> {{ cat.name }}{% if not forloop.last %}, {% endif %} </a>
+                            <a href="{% url 'blog:category' cat_name=cat.name %}"> {{ cat.name }}{% if not forloop.last %}, {% endif %} </a>
                             {% endfor %}
                         </div>
 
