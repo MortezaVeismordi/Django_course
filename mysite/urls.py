@@ -30,6 +30,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("website.urls")),
     path("blog/", include("blog.urls")),
+    path('summernote/' , include('django_summernote.urls')),
     path(
         "sitemap.xml",
         sitemap,

@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_extensions',
     'django.contrib.sites',
-    'django.contrib.sitemaps'
+    'django.contrib.sitemaps',
+    'taggit',
+    'django_summernote'
 ]
 
 MIDDLEWARE = [
