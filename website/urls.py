@@ -17,6 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from website.views import *
+from django.contrib.sitemaps.views import sitemap
+from django.urls import path
+
+from .sitemaps import StaticViewSitemap
+from . import views
+
+
 
 app_name = "website"
 urlpatterns = [
@@ -24,4 +31,5 @@ urlpatterns = [
     path('about' , about_me , name= 'about'),
     path('contact' , contact_me , name= 'contact'),
     path('test' , test_view , name= 'test'),
+
 ]

@@ -1,7 +1,10 @@
 from django.urls import path
 from blog.views import *
+from .sitemaps import BlogSitemap
+
 
 app_name = "blog"
+
 
 urlpatterns = [
     path('' , blog_view , name= 'index'),

@@ -63,18 +63,6 @@
 </head>
 
 <body>
-    {% if messages %}
-    <div id="popup-message" class="popup">
-        <div class="popup-content">
-            <span class="close" onclick="closePopup()">&times;</span>
-            {% for message in messages %}
-            <p>{{ message }}</p>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-
     <header id="header">
         <div class="header-top">
             <div class="container">
@@ -243,7 +231,7 @@
         window.onload = function () {
             var popup = document.getElementById("popup-message");
             if (popup) {
-                popup.style.display = "block"; 
+                popup.style.display = "block";
                 setTimeout(() => {
                     popup.style.display = "none";
                 }, 5000);
@@ -254,6 +242,17 @@
             document.getElementById("popup-message").style.display = "none";
         }
     </script>
+
+    {% if messages %}
+    <div id="popup-message" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
 
 </body>
