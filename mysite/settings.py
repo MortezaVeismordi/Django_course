@@ -31,6 +31,7 @@ SITE_ID=2
 # Application definition
 
 INSTALLED_APPS = [
+    'multi_captcha_admin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'website.apps.WebsiteConfig',
     'blog',
+    'captcha',
     'robots',
     "debug_toolbar", 
     'django.contrib.humanize',
@@ -48,6 +50,10 @@ INSTALLED_APPS = [
     'taggit',
     'django_summernote'
 ]
+
+MULTI_CAPTCHA_ADMIN = {
+    'engine': 'simple-captcha',
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
