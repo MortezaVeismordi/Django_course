@@ -1,29 +1,33 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate , login , logout , get_user_model
-from django.contrib.auth.forms import AuthenticationForm , UserCreationForm
+from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
 from django.shortcuts import redirect
-from django.contrib import messages 
+from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 
-#------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------
+
 
 def login_view(request):
     if request.method == "POST":
         username_email = request.POST.get("username_email", "").strip()
         password = request.POST.get("password", "").strip()
-        if not username_email or not password: 
+        if not username_email or not password:
             messages.error(request, "Please enter username or email and password.")
             return render(request, "accounts/login.html")
         user = None
         if "@" in username_email:
             try:
-                user_obj = User.objects.get(email=username_email)  
-                user = authenticate(request, username=user_obj.username, password=password)
+                user_obj = User.objects.get(email=username_email)
+                user = authenticate(
+                    request, username=user_obj.username, password=password
+                )
             except User.DoesNotExist:
                 messages.error(request, "No account found with this email.")
                 return render(request, "accounts/login.html")
-        else:  
+        else:
             user = authenticate(request, username=username_email, password=password)
         if user is not None:
             login(request, user)
@@ -33,77 +37,122 @@ def login_view(request):
             messages.error(request, "Invalid username/email or password.")
     return render(request, "accounts/login.html")
 
-#----------------------------------------------------------------------------------------------------------  
+
+# ----------------------------------------------------------------------------------------------------------
+
 
 def logout_veiw(request):
     if request.user.is_authenticated:
         logout(request)
-    return redirect('/')
+    return redirect("/")
 
-#----------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------
+
 
 def signup_view(request):
     if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password1 = request.POST.get("password1")
-        password2 = request.POST.get("password2")
+        username = request.POST.get("username").strip()
+        email = request.POST.get("email").strip()
+        password1 = request.POST.get("password1").strip()
+        password2 = request.POST.get("password2").strip()
 
+        if not username or not email or not password1 or not password2:
+            messages.error(request, "All fields are required.")
+            return redirect("accounts:signup")
         if password1 != password2:
             messages.error(request, "Passwords do not match.")
             return redirect("accounts:signup")
-
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists.")
             return redirect("accounts:signup")
-
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email already exists.")
             return redirect("accounts:signup")
-
-        user = User.objects.create_user(username=username, email=email, password=password1)
+        user = User.objects.create_user(
+            username=username, email=email, password=password1
+        )
         login(request, user)
-        messages.success(request, "Registration successful.")
+        messages.success(request, "Registration successful. Welcome!HI!!")
         return redirect("/")
 
     return render(request, "accounts/signup.html")
 
-#-----------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------
+
 
 def forgot_view(request):
     if request.method == "POST":
-        username = request.POST.get("username")
-        old_password = request.POST.get("old_password")
-        user = authenticate(request, username=username, password=old_password)
-        if user:
-            request.session["reset_user"] = user.username  
-            return redirect("accounts:reset_password")
-        else:
-            messages.error(request, "Username or password is incorrect.")
+        email = request.POST.get("email").strip()
+
+        if not email:
+            messages.error(request, "Please enter your email address.")
+            return redirect("accounts:forgot")
+
+        try:
+            user = User.objects.get(email=email)
+
+            token = get_random_string(length=32)
+            request.session["reset_token"] = token
+            request.session["reset_email"] = user.email
+
+            reset_link = request.build_absolute_uri(f"/reset-password/?token={token}")
+
+            send_mail(
+                "Reset Your Password",
+                f"Hello {user.username},\n\n"
+                f"Click the following link to reset your password:\n{reset_link}\n\n"
+                "If you didn't request this, please ignore this email.",
+                "noreply@example.com",
+                [user.email],
+            )
+
+            messages.success(
+                request, "A password reset link has been sent to your email."
+            )
+            return redirect("accounts:login")
+
+        except User.DoesNotExist:
+            messages.error(request, "No account found with this email.")
 
     return render(request, "accounts/forgot.html")
 
-#-------------------------------------------for (reset_password_view) to work last func must been done -------------------------------------
+
+# -------------------------------------------for (reset_password_view) to work last func must been done -------------------------------------
+
 
 def reset_password_view(request):
-    if "reset_user" not in request.session:
-        return redirect("accounts:password_reset")
+    token = request.GET.get("token")
+
+    if not token or request.session.get("reset_token") != token:
+        messages.error(request, "Invalid or expired token.")
+        return redirect("accounts:forgot")
+
     if request.method == "POST":
         new_password = request.POST.get("new_password")
         confirm_password = request.POST.get("confirm_password")
 
         if new_password != confirm_password:
             messages.error(request, "Passwords do not match.")
-            return redirect("accounts:reset_password")
+            return redirect(f"/reset-password/?token={token}")
 
-        username = request.session["reset_user"]
-        user = get_user_model().objects.get(username=username)
-        user.password = make_password(new_password)
-        user.save()
+        email = request.session.get("reset_email")
+        try:
+            user = get_user_model().objects.get(email=email)
+            user.password = make_password(new_password)
+            user.save()
 
-        del request.session["reset_user"]
-        messages.success(request, "Password has been successfully changed. Please log in.")
-        return redirect("accounts:login")
+            del request.session["reset_token"]
+            del request.session["reset_email"]
+
+            messages.success(
+                request, "Your password has been successfully changed. Please log in."
+            )
+            return redirect("accounts:login")
+
+        except get_user_model().DoesNotExist:
+            messages.error(request, "Something went wrong. Please try again.")
+            return redirect("accounts:forgot")
 
     return render(request, "accounts/reset_password.html")
-
