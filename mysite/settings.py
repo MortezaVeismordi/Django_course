@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'taggit',
-    'django_summernote'
+    'django_summernote',
+    'accounts'
 ]
 
 MULTI_CAPTCHA_ADMIN = {

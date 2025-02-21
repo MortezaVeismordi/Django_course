@@ -3,6 +3,9 @@ from django.utils import timezone
 from blog.models import Post , Coment
 from blog.models import Category
 from django.core.paginator import Paginator , EmptyPage , PageNotAnInteger
+from blog.forms import CommentForm
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
 def blog_view(request , **kwargs):
@@ -30,6 +33,15 @@ def blog_view(request , **kwargs):
 
 
 def blog_single (request , pid):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Your request has been processed successfully!')
+            else:
+                messages.error(request, 'Your request has been processed failed!')
+            
     now = timezone.now()
     post = get_object_or_404(Post , pk=pid , status = 1 , published_date__lte=now)
     post.counted_views += 1
@@ -37,11 +49,13 @@ def blog_single (request , pid):
     comments = Coment.objects.filter(post=post.id , approved = True).order_by('-created_date')
     previous_post = Post.objects.filter(status = 1 ,published_date__lt=post.published_date , published_date__lte=now).order_by('-published_date').first()
     next_post = Post.objects.filter(status = 1 ,published_date__gt=post.published_date , published_date__lte=now).order_by('published_date').first()
+    form = CommentForm()
     context = {
         'post': post,
         'previous_post': previous_post,
         'next_post': next_post,
         'comments':comments,
+        'CommentForm':form
     }
     return render(request , 'blog/blog-single.html' , context)
 
