@@ -23,10 +23,12 @@ from django.contrib.sitemaps.views import sitemap
 from website.sitemaps import StaticViewSitemap
 from blog.sitemaps import BlogSitemap
 from debug_toolbar.toolbar import debug_toolbar_urls
+from .view import under_construction
 
 # ----------------------------------------------------------------
 sitemaps = {"static": StaticViewSitemap, "blog": BlogSitemap}
 urlpatterns = [
+    re_path(r'^.*$', under_construction),
     path("admin/", admin.site.urls),
     path("", include("website.urls")),
     path("blog/", include("blog.urls")),
@@ -41,5 +43,7 @@ urlpatterns = [
     ),
     path("robots.txt", include("robots.urls")),
 ] + debug_toolbar_urls()
+
+
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
