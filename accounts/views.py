@@ -6,7 +6,8 @@ from django.utils.crypto import get_random_string
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
-
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 # ------------------------------------------------------------------------------------------------
 
 
@@ -96,16 +97,18 @@ def forgot_view(request):
             token = get_random_string(length=32)
             request.session["reset_token"] = token
             request.session["reset_email"] = user.email
-
             reset_link = request.build_absolute_uri(f"/reset-password/?token={token}")
+            subject = "Reset Your Password"
+            message = render_to_string(
+                "emails/reset_password.html", {"user": user, "reset_link": reset_link}
+            )
 
             send_mail(
-                "Reset Your Password",
-                f"Hello {user.username},\n\n"
-                f"Click the following link to reset your password:\n{reset_link}\n\n"
-                "If you didn't request this, please ignore this email.",
-                "noreply@example.com",
-                [user.email],
+                subject,
+                message,
+                "noreply@yourdomain.com",  
+                [user.email], 
+                fail_silently=False,
             )
 
             messages.success(
