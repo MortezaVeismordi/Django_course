@@ -28,7 +28,7 @@ from .view import under_construction
 # ----------------------------------------------------------------
 sitemaps = {"static": StaticViewSitemap, "blog": BlogSitemap}
 urlpatterns = [
-    re_path(r'^.*$', under_construction),
+    #re_path(r'^.*$', under_construction),
     path("admin/", admin.site.urls),
     path("", include("website.urls")),
     path("blog/", include("blog.urls")),

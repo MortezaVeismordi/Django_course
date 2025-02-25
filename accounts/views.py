@@ -5,11 +5,9 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.shortcuts import redirect
 from django.contrib import messages
-from django.contrib.auth.hashers import make_password
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-# ------------------------------------------------------------------------------------------------
+from django.conf import settings
 
+# -----------------------------------------------------------------------------------------------------
 
 def login_view(request):
     if request.method == "POST":
@@ -38,18 +36,14 @@ def login_view(request):
             messages.error(request, "Invalid username/email or password.")
     return render(request, "accounts/login.html")
 
-
 # ----------------------------------------------------------------------------------------------------------
 
-
-def logout_veiw(request):
+def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
     return redirect("/")
 
-
 # ----------------------------------------------------------------------------------------------------------
-
 
 def signup_view(request):
     if request.method == "POST":
@@ -74,14 +68,12 @@ def signup_view(request):
             username=username, email=email, password=password1
         )
         login(request, user)
-        messages.success(request, "Registration successful. Welcome!HI!!")
+        messages.success(request, "Registration successful.")
         return redirect("/")
 
     return render(request, "accounts/signup.html")
 
-
 # -----------------------------------------------------------------------------------------------------
-
 
 def forgot_view(request):
     if request.method == "POST":
@@ -97,23 +89,15 @@ def forgot_view(request):
             token = get_random_string(length=32)
             request.session["reset_token"] = token
             request.session["reset_email"] = user.email
-            reset_link = request.build_absolute_uri(f"/reset-password/?token={token}")
+
+
+            reset_link = request.build_absolute_uri(f"/accounts/reset-password/?token={token}")
+
             subject = "Reset Your Password"
-            message = render_to_string(
-                "emails/reset_password.html", {"user": user, "reset_link": reset_link}
-            )
+            message = f"Click the link to reset your password: {reset_link}"
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
-            send_mail(
-                subject,
-                message,
-                "noreply@yourdomain.com",  
-                [user.email], 
-                fail_silently=False,
-            )
-
-            messages.success(
-                request, "A password reset link has been sent to your email."
-            )
+            messages.success(request, "A password reset link has been sent to your email.")
             return redirect("accounts:login")
 
         except User.DoesNotExist:
@@ -121,12 +105,10 @@ def forgot_view(request):
 
     return render(request, "accounts/forgot.html")
 
-
-# -------------------------------------------for (reset_password_view) to work last func must been done -------------------------------------
-
+# -----------------------------------------------------------------------------------------------------
 
 def reset_password_view(request):
-    token = request.GET.get("token")
+    token = request.GET.get("token")  
 
     if not token or request.session.get("reset_token") != token:
         messages.error(request, "Invalid or expired token.")
@@ -138,20 +120,19 @@ def reset_password_view(request):
 
         if new_password != confirm_password:
             messages.error(request, "Passwords do not match.")
-            return redirect(f"/reset-password/?token={token}")
+            return redirect(f"accounts/reset-password/?token={token}")
 
         email = request.session.get("reset_email")
         try:
             user = get_user_model().objects.get(email=email)
-            user.password = make_password(new_password)
+            user.set_password(new_password)  
             user.save()
+
 
             del request.session["reset_token"]
             del request.session["reset_email"]
 
-            messages.success(
-                request, "Your password has been successfully changed. Please log in."
-            )
+            messages.success(request, "Your password has been successfully changed. Please log in.")
             return redirect("accounts:login")
 
         except get_user_model().DoesNotExist:

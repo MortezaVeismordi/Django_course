@@ -16,11 +16,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com' 
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your_email@gmail.com'  
-EMAIL_HOST_PASSWORD = 'your_email_password'  
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587 
+EMAIL_USE_TLS = True  
+EMAIL_HOST_USER = 'mveismordi@gmail.com'  
+EMAIL_HOST_PASSWORD = 'efhz ttpf ayfl azdf'  
+DEFAULT_FROM_EMAIL = 'mveismordi@gmail.com' 
+
 
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-default-key")
@@ -46,7 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'taggit',
     'django_summernote',
-    'accounts'
+    'accounts',
+    'compressor'
 ]
 
 MULTI_CAPTCHA_ADMIN = {
@@ -109,3 +112,13 @@ STATICFILES_DIRS = [
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+#---------------------compresing---------------------------
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',  
+]
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True  
+COMPRESS_CSS_HASHING_METHOD = 'content' 
+COMPRESS_JS_HASHING_METHOD = 'content'  
